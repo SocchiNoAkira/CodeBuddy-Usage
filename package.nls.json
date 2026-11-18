@@ -1,0 +1,21 @@
+{
+  "extension.description": "Show Tencent CodeBuddy credits / remaining quota in the VS Code status bar (auto-fetches the official usage API)",
+  "command.refresh": "CodeBuddy Usage: Refresh quota",
+  "command.setAccessToken": "CodeBuddy Usage: Paste Access Token (when auto-read fails)",
+  "command.fixAuth": "CodeBuddy Usage: Fix sign-in (re-read sign-in state / paste token)",
+  "command.openUsagePage": "CodeBuddy Usage: Open usage page",
+  "command.buddyClaim": "CodeBuddy Usage: Buddy claim credits",
+  "command.buddyDepart": "CodeBuddy Usage: Buddy depart",
+  "command.usageToday": "CodeBuddy Usage: Show today's token usage",
+  "command.usageMonth": "CodeBuddy Usage: Show this month's token usage",
+  "config.title": "CodeBuddy Usage",
+  "config.accessToken": "Manual Access Token (JWT). Normally NOT needed — the extension reads the CodeBuddy extension's sign-in state automatically (macOS / Windows). Fill it only when auto-read fails (CodeBuddy extension not installed, Linux, or the credential store is unavailable). Stored locally only",
+  "config.refreshIntervalMinutes": "Auto refresh interval (minutes), 0 disables auto refresh",
+  "config.autoCheckin": "Enable automatic daily check-in to claim credits (when disabled, no check-in runs and the hover tooltip hides the check-in status)",
+  "config.apiBase": "API base URL (domestic .cn / international .ai)",
+  "config.buddyTravel": "Enable buddy travel (send your buddy on tasks to earn credits automatically). When enabled, each refresh claims and dispatches the buddy automatically; the tooltip shows the travel countdown / claim / depart actions, once per day",
+  "config.tokenUsage": "Show token usage in the hover panel (parsed from the local CodeBuddy extension logs: this hour / today / this month, plus per-model breakdown)",
+  "config.usageLogPath": "Custom log directory of the CodeBuddy extension. Leave empty to auto-detect (%LOCALAPPDATA%/CodeBuddyExtension/Logs/VSCode on Windows)",
+  "config.usageTopModels": "How many models to list in the hover panel (1-10)",
+  "config.hoverStyle": "Hover panel style: rich = cards, progress bars and a 7-day chart; plain = the legacy markdown tables"
+}

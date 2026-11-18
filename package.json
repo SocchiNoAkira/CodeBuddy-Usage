@@ -1,0 +1,136 @@
+{
+  "name": "codebuddy-usage",
+  "displayName": "CodeBuddy Usage",
+  "description": "%extension.description%",
+  "publisher": "local",
+  "version": "0.1.0",
+  "icon": "resources/icon.png",
+  "license": "MIT",
+  "keywords": [
+    "CodeBuddy",
+    "WorkBuddy",
+    "腾讯云代码助手",
+    "credits",
+    "积分",
+    "余量",
+    "usage",
+    "statusbar"
+  ],
+  "galleryBanner": {
+    "color": "#1e415e",
+    "theme": "dark"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "l10n": "./l10n",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codebuddyUsage.refresh",
+        "title": "%command.refresh%"
+      },
+      {
+        "command": "codebuddyUsage.setAccessToken",
+        "title": "%command.setAccessToken%"
+      },
+      {
+        "command": "codebuddyUsage.fixAuth",
+        "title": "%command.fixAuth%"
+      },
+      {
+        "command": "codebuddyUsage.openUsagePage",
+        "title": "%command.openUsagePage%"
+      },
+      {
+        "command": "codebuddyUsage.buddyClaim",
+        "title": "%command.buddyClaim%"
+      },
+      {
+        "command": "codebuddyUsage.buddyDepart",
+        "title": "%command.buddyDepart%"
+      },
+      {
+        "command": "codebuddyUsage.usageToday",
+        "title": "%command.usageToday%"
+      },
+      {
+        "command": "codebuddyUsage.usageMonth",
+        "title": "%command.usageMonth%"
+      }
+    ],
+    "configuration": {
+      "title": "%config.title%",
+      "properties": {
+        "codebuddyUsage.accessToken": {
+          "type": "string",
+          "default": "",
+          "description": "%config.accessToken%"
+        },
+        "codebuddyUsage.refreshIntervalMinutes": {
+          "type": "number",
+          "default": 30,
+          "description": "%config.refreshIntervalMinutes%"
+        },
+        "codebuddyUsage.autoCheckin": {
+          "type": "boolean",
+          "default": true,
+          "description": "%config.autoCheckin%"
+        },
+        "codebuddyUsage.apiBase": {
+          "type": "string",
+          "default": "https://www.workbuddy.cn",
+          "description": "%config.apiBase%"
+        },
+        "codebuddyUsage.buddyTravel": {
+          "type": "boolean",
+          "default": true,
+          "description": "%config.buddyTravel%"
+        },
+        "codebuddyUsage.tokenUsage": {
+          "type": "boolean",
+          "default": true,
+          "description": "%config.tokenUsage%"
+        },
+        "codebuddyUsage.usageLogPath": {
+          "type": "string",
+          "default": "",
+          "description": "%config.usageLogPath%"
+        },
+        "codebuddyUsage.usageTopModels": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "maximum": 10,
+          "description": "%config.usageTopModels%"
+        },
+        "codebuddyUsage.hoverStyle": {
+          "type": "string",
+          "enum": [
+            "rich",
+            "plain"
+          ],
+          "default": "rich",
+          "description": "%config.hoverStyle%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.4.0"
+  }
+}
