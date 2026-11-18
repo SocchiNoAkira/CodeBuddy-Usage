@@ -1,6 +1,6 @@
 # CodeBuddy Usage
 
-在 VS Code 状态栏显示 **CodeBuddy / WorkBuddy 的积分余量**，并把 **token 消耗**、每日签到、喵喵旅行一起收进一个卡片式的悬浮面板里。
+在 VS Code 状态栏显示 **CodeBuddy / WorkBuddy 的积分余量**，悬停即可看到 **token 消耗明细**、每日签到状态和喵喵旅行进度。
 
 > 本项目为个人二次开发版本，与腾讯及 CodeBuddy / WorkBuddy 官方团队无关。
 
@@ -9,83 +9,93 @@
 ## 功能
 
 **状态栏**
-- 常驻显示当前剩余积分，例如 `⚡ 2431.68`，点击即可刷新
-- 空间不足时不会被挤掉（高优先级状态栏项）
+- 常驻显示剩余积分，例如 `⚡ 2431.68`，点击即可刷新
+- 高优先级状态栏项，空间紧张时不会被挤掉
 
-**悬浮面板（悬停状态栏）**
-- 顶部展示账号头像 + 昵称（取自本地登录态，不需要额外接口）
-- 剩余积分卡片：剩余 / 总量 / 百分比，配进度条
-- 状态胶囊：今日签到、喵喵旅行倒计时（可直接点「领积分」「去旅行」）、Token 有效期
-- token 消耗：**本小时 / 今日 / 本月** 三档合计，各自带积分消耗
-- 近 7 天用量柱状图（平方根归一化，日用量差异大时也能看出趋势）
-- **今日 / 本月** 页签切换，下方按模型列出消耗明细（合计 + 积分 + 占比条）
-- 套餐额度列表：每个套餐的剩余 / 总量 / 到期日，配进度条
-- 底部显示最近更新时间与数据来源
+**悬浮面板（鼠标悬停状态栏）**
+- 顶部：账号头像 + 昵称（取自本地登录态，不额外请求接口）
+- 剩余积分：大字号数值 + `剩余 / 总量 · 百分比`，总量可点击跳转官网用量页
+- 状态行：今日签到状态；喵喵旅行中显示剩余时间，达到当日上限时显示提示
+- **token 消耗**：按本小时 / 今日 / 本月三档，分别列出 `用量`、`输入`、`输出`、`缓存命中率`、`积分消耗`
+- **今日按模型**：模型、用量、积分、占比条，按用量降序
+- **套餐额度**：套餐名、剩余 / 总量、到期日（纯数字，不占视觉）
+- 页脚：最近更新时间 + 数据来源
 
-**自动化**
+**自动化（默认开启，每 30 分钟一次）**
 - 每日自动签到领积分
-- 喵喵旅行：自动领取到账积分并派它出门赚下一趟
-- 默认每 30 分钟自动刷新，可在设置里调整或关闭
+- 喵喵旅行：自动领取已挣到的积分，并派出下一趟
+- 刷新间隔可调整或关闭
 
 **登录态**
-- Windows 走 DPAPI、macOS 走钥匙串，自动读取 CodeBuddy 官方扩展保存的 `accessToken`
-- 自动读取失败时（未装官方扩展、Linux、凭据不可用）可手动粘贴 Token 兜底
+- Windows 走 DPAPI、macOS 走钥匙串，自动读取官方扩展保存的 `accessToken`
+- 自动读取失败时（未装官方扩展、Linux、系统凭据不可用）可手动粘贴 Token 兜底
 
 **其它**
-- 中英文界面（跟随 VS Code 显示语言）
+- 中英文界面，跟随 VS Code 显示语言
 - 无运行时依赖，纯 TypeScript 编译产物
 
 ---
 
 ## 安装
 
-1. 安装本扩展：`code --install-extension codebuddy-usage-0.1.0.vsix`
-2. 在 VS Code 中安装并登录 **Tencent Cloud CodeBuddy**（`tencent-cloud.coding-copilot`）
-3. 无需任何配置，状态栏会自动出现余量
+**从 vsix 安装**（推荐）
 
-> 只需要 VS Code 扩展，不需要安装 WorkBuddy / CodeBuddy 桌面端。
-> CodeBuddy 与 WorkBuddy 共用同一套账号体系；本扩展默认请求 `https://www.workbuddy.cn`，
+```bash
+code --install-extension codebuddy-usage-0.1.6.vsix
+```
+
+或在扩展视图右上角 `⋯` → **Install from VSIX...**，装完 Reload Window。
+
+**前提**：VS Code 里需安装并登录 **Tencent Cloud CodeBuddy**（`tencent-cloud.coding-copilot`），本扩展从它保存的登录态里取 `accessToken`。不需要安装 WorkBuddy / CodeBuddy 桌面端。
+
+> CodeBuddy 与 WorkBuddy 共用同一套账号体系。扩展默认请求 `https://www.workbuddy.cn`，
 > 国际站请在设置里把 `apiBase` 改为 `https://www.workbuddy.ai`。
 
 ---
 
-## 悬浮面板示意
+## 悬浮面板
 
 ```
-🖼 昵称 · CodeBuddy 积分余量
-┌────────────────────────────────────┐
-│ 剩余积分                            │
-│ 2,431.68 / 3,530           68.9%   │
-│ ████████████████░░░░░░░░           │
-└────────────────────────────────────┘
-(✓ 今日已签到) (✿ 喵喵返程 03:12:45) (领积分) (去旅行) (Token 有效期至 01-15)
+### 🖼 Akira · CodeBuddy 积分余量
 
-TOKEN 消耗
-本小时           今日            本月
-3.28M           9.48M           127.2M
-8.07 积分        40.81 积分      267.21 积分
-        ▁ ▂ ▃ ▁ ▂ ▇ ▃
-[ 今日 ]  本月
-Deepseek-V4.1-Flash   9.48M   40.81
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 100%
+## 10,320.64
+剩余 / 总量 10,407　·　99.2%
 
-套餐额度
-个人体验版              1,200 / 1,500
-▓▓▓▓▓▓▓▓▓░            2026-12-31
+今日已签到　·　✿ 喵喵旅行剩余 00:05:42
 
-更新于 11/18 16:04:12      数据来自本地 CodeBuddy 日志
+***
+
+⚡ Token 消耗
+
+| 时段 | 用量 | 输入 | 输出 | 缓存命中 | 积分 |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| 本小时 | 674K | 667K | 7.72K | 100% | 2.83 |
+| 今日 | 33.8M | 33.6M | 219K | 98% | 132.31 |
+| 本月 | 152M | 151M | 512K | 99% | 358.71 |
+
+| 模型 | 用量 | 积分 | 占比 |
+| :--- | ---: | ---: | :--- |
+| Deepseek-V4.1-Flash | 33.8M | 132.31 | ━━━━━━━━ 100% |
+
+***
+
+🧩 套餐额度
+
+*共 39 个有余量的套餐，显示前 5 个*
+
+| 套餐 | 剩余 | 到期 |
+| :--- | ---: | ---: |
+| CodeBuddy个人版国内运营裂变包 | 13.64 / 100 | 2026-11-22 |
+
+*更新于 11/18 17:09　·　数据来自本地 CodeBuddy 日志*
 ```
 
-### 关于页签
+几点说明：
 
-点击「今日 / 本月」后悬浮框会被关闭（VS Code 不会保持 hover），状态栏会提示一句
-「Token 消耗：已切换为本月，再次悬停状态栏即可查看」，**再悬停一次**就是切换后的视图。
-选择会记住，重启后保持不变。
-
-不想用鼠标时，也可以在命令面板执行：
-
-- `CodeBuddy Usage: 查看今日 token 消耗`
-- `CodeBuddy Usage: 查看本月 token 消耗`
+- **缓存命中率** = `cacheTokens / inputTokens`，即输入 token 中命中缓存的比例，数值越高越省钱
+- 模型列表固定展示**今日**数据，按用量降序，默认前 5 个（可配 1–10）
+- 套餐只展示有余量的前 5 个，剩余与总量按本周期计算
+- 面板由 VS Code 的 Markdown 渲染器绘制，跟随主题，文字可选中复制
 
 ---
 
@@ -100,10 +110,22 @@ Deepseek-V4.1-Flash   9.48M   40.81
 | `autoCheckin` | 开 | 自动每日签到 |
 | `buddyTravel` | 开 | 自动喵喵旅行（领取 + 派出） |
 | `apiBase` | `https://www.workbuddy.cn` | 国内站；国际站填 `https://www.workbuddy.ai` |
-| `tokenUsage` | 开 | 悬浮面板是否展示 token 消耗 |
+| `tokenUsage` | 开 | 是否展示 token 消耗区块 |
 | `usageLogPath` | 空 | 自定义 CodeBuddy 日志目录；留空自动探测 |
 | `usageTopModels` | 5 | 模型列表条数（1–10） |
-| `hoverStyle` | `rich` | `rich` = 卡片样式；`plain` = 旧版纯表格（出问题时兜底） |
+| `hoverStyle` | `rich` | `rich` = 当前看板；`plain` = 早期纯表格样式（兜底用） |
+
+## 命令
+
+命令面板（`Ctrl+Shift+P`）搜索 `CodeBuddy Usage`：
+
+| 命令 | 用途 |
+| --- | --- |
+| 刷新余量 | 手动刷新一次 |
+| 输入 Access Token（自动读取失败时） | 手动粘贴 JWT，留空表示清除 |
+| 修复登录（重新读取登录态 / 输入 Token） | 登录异常时的一键修复菜单 |
+| 打开官网用量页 | 浏览器打开用量页 |
+| 喵喵领积分 / 喵喵去旅行 | 手动触发一次（自动流程之外） |
 
 ---
 
@@ -115,8 +137,8 @@ Deepseek-V4.1-Flash   9.48M   40.81
 | token 消耗 | 本机 CodeBuddy 扩展的日志：`%LOCALAPPDATA%\CodeBuddyExtension\Logs\VSCode\<日期>\*.log`（macOS / Linux 对应应用数据目录） |
 
 - 凭据只在本机读取与缓存，**不会上传到任何地方**，也不经过第三方
-- token 缓存在扩展自己的 SecretStorage（VS Code 加解密），只有 token 临近过期时才重新读取系统凭据
-- token 用量统计只读本地日志，不额外发起网络请求；累计结果存在扩展的 globalStorage，日志被轮转清理后历史仍保留
+- token 缓存在扩展自己的 SecretStorage（VS Code 加解密），仅在 token 临近过期时重新读取系统凭据
+- token 用量统计只读本地日志，不发起额外网络请求；累计结果存在扩展的 globalStorage，日志被轮转清理后历史仍保留
 - 统计范围仅限**本机、当前 IDE** 的调用，不含网页版 / 其它机器
 
 ---
@@ -125,12 +147,14 @@ Deepseek-V4.1-Flash   9.48M   40.81
 
 | 现象 | 处理 |
 | --- | --- |
+| 状态栏没有出现 | Reload Window；确认没有同时装着旧版本扩展 |
 | 显示「未找到登录凭据」 | 确认 VS Code 里 CodeBuddy 扩展已登录；仍不行就手动粘贴 Access Token |
 | 显示「登录已过期」 | 先在 CodeBuddy 里重新登录，再点状态栏选「重新读取 CodeBuddy 登录态并刷新」 |
 | 显示「拉取失败」 | 点状态栏重试 |
-| token 区块显示「未找到 CodeBuddy 日志」 | 确认官方扩展已登录并使用过；或在设置里用 `usageLogPath` 指定日志目录 |
+| token 区块显示「未找到 CodeBuddy 日志」 | 官方扩展至少用过一次；或在设置里用 `usageLogPath` 指定日志目录 |
+| 命中的日志目录不对 | 检查 `%LOCALAPPDATA%\CodeBuddyExtension\Logs\VSCode` 是否存在 |
 | 用的是国际站 | 把 `apiBase` 改为 `https://www.workbuddy.ai` |
-| 面板样式异常 | 把 `hoverStyle` 改成 `plain` 回到旧版表格 |
+| 想回到旧版表格样式 | 把 `hoverStyle` 设为 `plain` |
 
 ---
 
@@ -143,7 +167,7 @@ npm install
 npm run compile      # 生成 out/，之后即可按 F5 调试
 ```
 
-- `F5`：已配置 `.vscode/launch.json`，会自动先执行 `npm: compile`，再打开扩展开发宿主窗口
+- `F5`：若提示选择环境，选 **VS Code Extension**，VS Code 会自动生成 `.vscode/launch.json`
 - `npm run watch`：边改边编译，改完在宿主窗口 `Ctrl+R` 重载生效
 
 打包：
@@ -158,7 +182,7 @@ vsce package         # 自动先执行 npm run compile，产物为 codebuddy-usa
 | 文件 | 职责 |
 | --- | --- |
 | `src/extension.ts` | 状态栏、命令、用量/签到/喵喵流程、悬浮面板数据装配 |
-| `src/hover-view.ts` | 悬浮面板的 HTML 渲染（卡片、进度条、柱状图、页签） |
+| `src/hover-view.ts` | 悬浮面板的 Markdown 渲染 |
 | `src/usage-log.ts` | 解析 CodeBuddy 本地日志中的 token 用量 |
 | `src/usage-store.ts` | 用量增量索引与持久化 |
 | `src/auth.ts` | 登录态自动读取与 token 缓存 |

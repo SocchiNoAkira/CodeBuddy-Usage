@@ -1,6 +1,6 @@
 # CodeBuddy Usage
 
-Show your **CodeBuddy / WorkBuddy credits** in the VS Code status bar, and keep **token usage**, the daily check-in and the buddy travel in one card-style hover panel.
+Show **CodeBuddy / WorkBuddy credits** in the VS Code status bar. Hover it to see **token usage**, the daily check-in state and your buddy's travel progress.
 
 > Personal fork / secondary development. Not affiliated with Tencent or the official CodeBuddy / WorkBuddy teams.
 
@@ -16,76 +16,88 @@ Show your **CodeBuddy / WorkBuddy credits** in the VS Code status bar, and keep 
 
 **Hover panel**
 - Avatar + nickname from the local sign-in state (no extra API call)
-- Credits card: remaining / total / percentage with a progress bar
-- Status chips: today's check-in, buddy travel countdown (with clickable *Claim* / *Depart*), token expiry
-- **Token usage for this hour / today / this month**, each with the credits consumed
-- Last-7-days bar chart (square-root scaled, so days of very different volume stay readable)
-- **Today / This month** tabs, with a per-model breakdown (tokens, credits, share bar)
-- Package list: remaining / total / expiry per package, with progress bars
-- Footer with last-updated time and data source
+- Credits: large number plus `remaining / total · percentage`; the total links to the web usage page
+- Status line: today's check-in; buddy travel remaining time, or a hint when the daily limit is hit
+- **Token usage** for this hour / today / this month, each with `total`, `input`, `output`, `cache hit rate` and `credits`
+- **Per-model breakdown for today**: model, tokens, credits, share bar, sorted by usage
+- **Package credits**: name, remaining / total, expiry — plain numbers only
+- Footer: last update time and data source
 
-**Automation**
+**Automation (on by default, every 30 minutes)**
 - Daily check-in to claim credits
-- Buddy travel: claim earned credits and send the buddy out again
-- Auto refresh every 30 minutes (configurable / can be disabled)
+- Buddy travel: claim the earned credits and send the buddy out again
+- The interval is configurable and can be disabled
 
 **Sign-in**
 - Reads the `accessToken` stored by the official CodeBuddy extension — DPAPI on Windows, Keychain on macOS
 - Falls back to a manually pasted token (no official extension, Linux, or unavailable credential store)
 
 **Other**
-- Chinese / English UI (follows the VS Code display language)
+- Chinese / English UI, following the VS Code display language
 - No runtime dependencies, plain TypeScript output
 
 ---
 
 ## Install
 
-1. `code --install-extension codebuddy-usage-0.1.0.vsix`
-2. Install and sign in to **Tencent Cloud CodeBuddy** (`tencent-cloud.coding-copilot`) in VS Code
-3. No configuration needed — the status bar item shows up automatically
+**From a vsix** (recommended)
 
-> Only the VS Code extension is required. CodeBuddy and WorkBuddy share the same account.
-> The default API base is `https://www.workbuddy.cn`; set `apiBase` to `https://www.workbuddy.ai` for the international site.
+```bash
+code --install-extension codebuddy-usage-0.1.6.vsix
+```
+
+Or in the Extensions view: `⋯` → **Install from VSIX...**, then reload the window.
+
+**Requirement**: install and sign in to **Tencent Cloud CodeBuddy** (`tencent-cloud.coding-copilot`) in VS Code — this extension reads the `accessToken` it stores. The desktop apps are not needed.
+
+> CodeBuddy and WorkBuddy share the same account. The default API base is `https://www.workbuddy.cn`;
+> set `apiBase` to `https://www.workbuddy.ai` for the international site.
 
 ---
 
 ## Hover panel
 
 ```
-🖼 nickname · CodeBuddy Credits
-┌────────────────────────────────────┐
-│ Remaining                           │
-│ 2,431.68 / 3,530           68.9%    │
-│ ████████████████░░░░░░░░            │
-└────────────────────────────────────┘
-(✓ Checked in) (✿ Buddy back in 03:12:45) (Claim) (Depart) (Token until 01-15)
+### 🖼 Akira · CodeBuddy Credits
 
-TOKEN USAGE
-This hour        Today           This month
-3.28M            9.48M           127.2M
-8.07 credits     40.81 credits   267.21 credits
-        ▁ ▂ ▃ ▁ ▂ ▇ ▃
-[ Today ]  This month
-Deepseek-V4.1-Flash   9.48M   40.81
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 100%
+## 10,320.64
+Remaining / Total 10,407　·　99.2%
 
-PACKAGE CREDITS
-个人体验版              1,200 / 1,500
-▓▓▓▓▓▓▓▓▓░            2026-12-31
+Checked in today　·　✿ Buddy travel remaining 00:05:42
 
-Updated 11/18 16:04:12      From local CodeBuddy logs
+***
+
+⚡ Token usage
+
+| Period | Tokens | Input | Output | Cache hit | Credits |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| This hour | 674K | 667K | 7.72K | 100% | 2.83 |
+| Today | 33.8M | 33.6M | 219K | 98% | 132.31 |
+| This month | 152M | 151M | 512K | 99% | 358.71 |
+
+| Model | Tokens | Credits | Share |
+| :--- | ---: | ---: | :--- |
+| Deepseek-V4.1-Flash | 33.8M | 132.31 | ━━━━━━━━ 100% |
+
+***
+
+🧩 Package credits
+
+*39 packages with credits left, showing the first 5*
+
+| Package | Left | Expires |
+| :--- | ---: | ---: |
+| CodeBuddy Individual Plan Bundle | 13.64 / 100 | 2026-11-22 |
+
+*Updated 11/18 17:09　·　From local CodeBuddy logs*
 ```
 
-### About the tabs
+Notes:
 
-Clicking **Today / This month** closes the hover (VS Code does not keep it open). The status bar shows
-a short confirmation — hover it again to see the switched view. The choice is remembered across restarts.
-
-Both views are also available from the command palette:
-
-- `CodeBuddy Usage: Show today's token usage`
-- `CodeBuddy Usage: Show this month's token usage`
+- **Cache hit rate** = `cacheTokens / inputTokens` — the share of input tokens served from cache
+- The model list always shows **today**, sorted by usage, top 5 by default (1–10 configurable)
+- Package list shows the first 5 packages that still have credits, using this cycle's numbers
+- The panel is rendered by VS Code's Markdown renderer: follows the theme, text is selectable
 
 ---
 
@@ -100,10 +112,22 @@ Search for `codebuddyUsage`:
 | `autoCheckin` | on | Automatic daily check-in |
 | `buddyTravel` | on | Automatic buddy travel (claim + depart) |
 | `apiBase` | `https://www.workbuddy.cn` | Domestic site; use `https://www.workbuddy.ai` for the international one |
-| `tokenUsage` | on | Show the token usage block in the hover panel |
+| `tokenUsage` | on | Show the token usage block |
 | `usageLogPath` | empty | Custom CodeBuddy log directory; auto-detected when empty |
 | `usageTopModels` | 5 | Number of models listed (1–10) |
-| `hoverStyle` | `rich` | `rich` = card layout, `plain` = legacy tables (fallback) |
+| `hoverStyle` | `rich` | `rich` = current dashboard; `plain` = legacy table layout (fallback) |
+
+## Commands
+
+Search `CodeBuddy Usage` in the command palette (`Ctrl+Shift+P`):
+
+| Command | Purpose |
+| --- | --- |
+| Refresh quota | Refresh once |
+| Paste Access Token (when auto-read fails) | Paste a JWT manually; empty clears it |
+| Fix sign-in (re-read sign-in state / paste token) | One-stop recovery menu |
+| Open usage page | Open the web usage page |
+| Buddy claim credits / Buddy depart | Manual trigger outside the automation |
 
 ---
 
@@ -125,12 +149,14 @@ Search for `codebuddyUsage`:
 
 | Symptom | Fix |
 | --- | --- |
+| Nothing in the status bar | Reload the window; make sure no older version is installed alongside |
 | "No credentials found" | Make sure the CodeBuddy extension is signed in; otherwise paste an Access Token |
 | "Login expired" | Sign in again in CodeBuddy, then click the status bar and pick "Re-read the CodeBuddy sign-in state" |
 | "Fetch failed" | Click the status bar to retry |
 | "No CodeBuddy logs found" | Use the official extension at least once, or point `usageLogPath` at the log directory |
+| Wrong log directory picked up | Check that `%LOCALAPPDATA%\CodeBuddyExtension\Logs\VSCode` exists |
 | Using the international site | Set `apiBase` to `https://www.workbuddy.ai` |
-| Panel looks broken | Set `hoverStyle` to `plain` |
+| Want the old table layout | Set `hoverStyle` to `plain` |
 
 ---
 
@@ -143,7 +169,7 @@ npm install
 npm run compile      # produces out/, then press F5 to debug
 ```
 
-- `F5`: `.vscode/launch.json` is included, so it runs `npm: compile` first and then opens the Extension Development Host
+- `F5`: if VS Code asks for an environment, pick **VS Code Extension** — it generates `.vscode/launch.json` for you
 - `npm run watch`: recompile on save; press `Ctrl+R` in the host window to reload
 
 Package:
@@ -158,7 +184,7 @@ Source layout:
 | File | Responsibility |
 | --- | --- |
 | `src/extension.ts` | Status bar, commands, usage/check-in/buddy flows, hover panel data |
-| `src/hover-view.ts` | Hover panel HTML rendering (cards, bars, chart, tabs) |
+| `src/hover-view.ts` | Markdown rendering of the hover panel |
 | `src/usage-log.ts` | Parser for token usage in the CodeBuddy local logs |
 | `src/usage-store.ts` | Incremental usage index and persistence |
 | `src/auth.ts` | Sign-in state auto-read and token cache |
