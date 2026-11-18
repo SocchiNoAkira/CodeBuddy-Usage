@@ -11,7 +11,7 @@ import {
   Profile,
 } from "./auth";
 import { UsageSnapshot, UsageStore } from "./usage-store";
-import { HoverChip, HoverRange, HoverUsageVM, HoverVM, renderHover } from "./hover-view";
+import { HoverChip, HoverUsageVM, HoverVM, UsageCell, renderHover } from "./hover-view";
 
 /**
  * 本地化入口：语言自动跟随 VS Code 显示语言（vscode.env.language）。
@@ -108,9 +108,7 @@ let updating = false;
 // ============================================================
 let usageStore: UsageStore | undefined;
 let lastUsage: UsageSnapshot | undefined;
-/** 悬浮框里模型列表当前展示的时间窗：今日 / 本月 */
-let usageRange: HoverRange = "today";
-let extContext: vscode.ExtensionContext | undefined;
+
 
 const DEFAULT_PACKAGE_CODES = [
   "TCACA_code_008_cfWoLwvjU4",
@@ -753,25 +751,6 @@ async function loadUsage(): Promise<UsageSnapshot | undefined> {
   }
 }
 
-/** 切换悬浮框里模型列表的时间窗（页签点击）。hover 会被关闭，再次悬停即看到切换后的视图 */
-async function setUsageRange(range: HoverRange) {
-  usageRange = range;
-  try {
-    await extContext?.globalState.update("codebuddyUsage.usageRange", range);
-  } catch {
-    /* 持久化失败不影响本次展示 */
-  }
-  refreshTooltip();
-  // 点击页签时 hover 会被 VS Code 关闭，这里给一句轻提示，避免「点了没反应」的错觉
-  vscode.window.setStatusBarMessage(
-    t(
-      "Token usage: showing {0} — hover the status bar again",
-      range === "month" ? t("This month") : t("Today")
-    ),
-    2500
-  );
-}
-
 /** 有剩余额度的套餐，按到期时间升序 */
 function visibleAccounts(res: UsageResult): Account[] {
   return res.accounts
@@ -810,52 +789,27 @@ function buddyChips(): HoverChip[] {
   const b = lastBuddy;
   if (!b || !b.status) return [{ text: t("Buddy unknown"), tone: "muted" }];
 
+  // 自动流程每 30 分钟检查/派遣，所以这里只反映状态，不放手动操作
   if (b.status.state === "traveling") {
     const nowSec = b.status.serverNow ?? Math.floor(Date.now() / 1000);
     const remain = Math.max(0, (b.status.arriveAt ?? 0) - nowSec);
     const pad = (n: number) => String(n).padStart(2, "0");
     return [
       {
-        text: t(
-          "Buddy back in {0}:{1}:{2}",
+        text: `✿ ${t(
+          "Buddy travel remaining {0}:{1}:{2}",
           pad(Math.floor(remain / 3600)),
           pad(Math.floor((remain % 3600) / 60)),
           pad(remain % 60)
-        ),
+        )}`,
         tone: "muted",
       },
     ];
   }
-
-  const credit = (b.claim as any)?.credit;
   if (b.status.dailyLimitReached) {
-    return [
-      {
-        text: credit > 0 ? t("Buddy done today · +{0}", credit) : t("Buddy done today"),
-        tone: "ok",
-      },
-    ];
+    return [{ text: `✿ ${t("Buddy reached today's limit")}`, tone: "warn" }];
   }
-  const chipsList: HoverChip[] = [];
-  if (credit != null) {
-    chipsList.push(
-      credit > 0 ? { text: t("Claimed {0}", credit), tone: "ok" } : { text: t("Nothing to claim"), tone: "muted" }
-    );
-  } else {
-    chipsList.push({ text: t("Claim credits"), link: "command:codebuddyUsage.buddyClaim", tone: "muted" });
-  }
-  chipsList.push({ text: t("Send to travel"), link: "command:codebuddyUsage.buddyDepart", tone: "muted" });
-  return chipsList;
-}
-
-function authChip(): HoverChip | undefined {
-  const a = lastAuth;
-  if (!a) return undefined;
-  if (!a.token) return { text: t("Not signed in"), tone: "err" };
-  if (!a.expiresAt) return undefined;
-  const d = new Date(a.expiresAt);
-  const p = (n: number) => String(n).padStart(2, "0");
-  return { text: t("Token valid until {0}", `${p(d.getMonth() + 1)}-${p(d.getDate())}`), tone: "muted" };
+  return [];
 }
 
 function buildUsageVM(): HoverUsageVM | undefined {
@@ -863,14 +817,21 @@ function buildUsageVM(): HoverUsageVM | undefined {
   const snap = lastUsage;
   if (!snap) return undefined;
 
+  const cell = (w: UsageSnapshot["today"]): UsageCell => ({
+    total: w.totals.total,
+    input: w.totals.input,
+    output: w.totals.output,
+    cache: w.totals.cache,
+    credit: w.totals.credit,
+  });
+
   const top = Math.max(1, Math.min(10, getConfig().get<number>("usageTopModels", 5)));
-  const win = usageRange === "month" ? snap.month : snap.today;
-  const rangeTotal = win.totals.total;
+  const win = snap.today;
   const rows = win.models.slice(0, top).map((m) => ({
     name: m.modelName,
     total: m.total,
     credit: m.credit,
-    share: rangeTotal > 0 ? m.total / rangeTotal : 0,
+    share: win.totals.total > 0 ? m.total / win.totals.total : 0,
   }));
   const note =
     win.models.length > 0
@@ -880,14 +841,9 @@ function buildUsageVM(): HoverUsageVM | undefined {
         : t("No usage recorded for this period");
 
   return {
-    hourTotal: snap.hour.totals.total,
-    hourCredit: snap.hour.totals.credit,
-    todayTotal: snap.today.totals.total,
-    todayCredit: snap.today.totals.credit,
-    monthTotal: snap.month.totals.total,
-    monthCredit: snap.month.totals.credit,
-    week: snap.week.map((w) => ({ label: w.label, total: w.total })),
-    range: usageRange,
+    hour: cell(snap.hour),
+    today: cell(snap.today),
+    month: cell(snap.month),
     rows,
     modelCount: win.models.length,
     note,
@@ -904,8 +860,6 @@ function buildHoverVM(res: UsageResult, updatedAt?: Date): HoverVM {
   const ck = checkinChip();
   if (ck) chipsList.push(ck);
   chipsList.push(...buddyChips());
-  const au = authChip();
-  if (au) chipsList.push(au);
 
   return {
     nickname: nickname || undefined,
@@ -1402,9 +1356,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   // token 用量索引：解析结果存到扩展自己的 globalStorage，
   // 这样即使官方日志被轮转清理，「本月」的累计值也不会丢。
-  extContext = context;
-  usageRange =
-    context.globalState.get<string>("codebuddyUsage.usageRange") === "month" ? "month" : "today";
   usageStore = new UsageStore(context.globalStorageUri.fsPath);
   context.subscriptions.push({ dispose: () => usageStore?.dispose() });
 
@@ -1433,13 +1384,6 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("codebuddyUsage.buddyDepart", () => buddyDepartCmd())
   );
   // 悬浮框里的页签（命令面板中隐藏）：切换模型列表的时间窗
-  context.subscriptions.push(
-    vscode.commands.registerCommand("codebuddyUsage.usageToday", () => setUsageRange("today"))
-  );
-  context.subscriptions.push(
-    vscode.commands.registerCommand("codebuddyUsage.usageMonth", () => setUsageRange("month"))
-  );
-
   update();
   scheduleTimer();
 

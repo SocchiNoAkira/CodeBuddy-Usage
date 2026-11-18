@@ -6,8 +6,6 @@
   "command.openUsagePage": "CodeBuddy Usage: Open usage page",
   "command.buddyClaim": "CodeBuddy Usage: Buddy claim credits",
   "command.buddyDepart": "CodeBuddy Usage: Buddy depart",
-  "command.usageToday": "CodeBuddy Usage: Show today's token usage",
-  "command.usageMonth": "CodeBuddy Usage: Show this month's token usage",
   "config.title": "CodeBuddy Usage",
   "config.accessToken": "Manual Access Token (JWT). Normally NOT needed — the extension reads the CodeBuddy extension's sign-in state automatically (macOS / Windows). Fill it only when auto-read fails (CodeBuddy extension not installed, Linux, or the credential store is unavailable). Stored locally only",
   "config.refreshIntervalMinutes": "Auto refresh interval (minutes), 0 disables auto refresh",

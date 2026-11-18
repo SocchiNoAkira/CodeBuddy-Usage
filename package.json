@@ -3,7 +3,7 @@
   "displayName": "CodeBuddy Usage",
   "description": "%extension.description%",
   "publisher": "local",
-  "version": "0.1.0",
+  "version": "0.1.6",
   "icon": "resources/icon.png",
   "license": "MIT",
   "repository": {
@@ -64,14 +64,6 @@
       {
         "command": "codebuddyUsage.buddyDepart",
         "title": "%command.buddyDepart%"
-      },
-      {
-        "command": "codebuddyUsage.usageToday",
-        "title": "%command.usageToday%"
-      },
-      {
-        "command": "codebuddyUsage.usageMonth",
-        "title": "%command.usageMonth%"
       }
     ],
     "configuration": {
