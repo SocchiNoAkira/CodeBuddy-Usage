@@ -136,16 +136,21 @@ Search for `codebuddyUsage`:
 
 ## Development
 
+This repository only contains source and manifest files. Build output (`out/`), dependencies (`node_modules/`) and `.vsix` packages are not tracked — build it yourself after cloning.
+
 ```bash
 npm install
-npm run compile        # or press F5 to debug in the Extension Development Host
+npm run compile      # produces out/, then press F5 to debug
 ```
+
+- `F5`: `.vscode/launch.json` is included, so it runs `npm: compile` first and then opens the Extension Development Host
+- `npm run watch`: recompile on save; press `Ctrl+R` in the host window to reload
 
 Package:
 
 ```bash
 npm install -g @vscode/vsce
-vsce package
+vsce package         # runs npm run compile first, outputs codebuddy-usage-<version>.vsix
 ```
 
 Source layout:

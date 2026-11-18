@@ -6,6 +6,14 @@
   "version": "0.1.0",
   "icon": "resources/icon.png",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SocchiNoAkira/CodeBuddy-Usage.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SocchiNoAkira/CodeBuddy-Usage/issues"
+  },
+  "homepage": "https://github.com/SocchiNoAkira/CodeBuddy-Usage#readme",
   "keywords": [
     "CodeBuddy",
     "WorkBuddy",

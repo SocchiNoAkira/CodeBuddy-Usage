@@ -136,16 +136,21 @@ Deepseek-V4.1-Flash   9.48M   40.81
 
 ## 开发
 
+仓库只包含源码与清单文件：编译产物 `out/`、依赖 `node_modules/`、`.vsix` 包都不纳入版本管理，克隆后需要自行构建。
+
 ```bash
 npm install
-npm run compile        # 或按 F5 在扩展开发宿主中调试
+npm run compile      # 生成 out/，之后即可按 F5 调试
 ```
+
+- `F5`：已配置 `.vscode/launch.json`，会自动先执行 `npm: compile`，再打开扩展开发宿主窗口
+- `npm run watch`：边改边编译，改完在宿主窗口 `Ctrl+R` 重载生效
 
 打包：
 
 ```bash
 npm install -g @vscode/vsce
-vsce package
+vsce package         # 自动先执行 npm run compile，产物为 codebuddy-usage-<version>.vsix
 ```
 
 源码结构：
