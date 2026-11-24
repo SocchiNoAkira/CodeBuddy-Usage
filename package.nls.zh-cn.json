@@ -14,6 +14,7 @@
   "config.buddyTravel": "启用喵喵旅行（派喵喵出任务自动赚积分）。开启后每次刷新会自动领取并派出喵喵，悬浮框展示旅行倒计时/领积分/去旅行，一日一次",
   "config.tokenUsage": "在悬浮框显示 token 消耗（解析 CodeBuddy 扩展的本地日志：本小时 / 今日 / 本月，以及按模型的消耗明细）",
   "config.usageLogPath": "自定义 CodeBuddy 扩展的日志目录。留空则自动探测（Windows 为 %LOCALAPPDATA%/CodeBuddyExtension/Logs/VSCode）",
+  "config.usageRefreshSeconds": "多久重新扫描一次本地 CodeBuddy 日志以更新 token 统计（秒，默认 60，最小 5，0 关闭）。只读本地文件，不发起网络请求",
   "config.usageTopModels": "悬浮框中列出多少个模型（1-10）",
   "config.hoverStyle": "悬浮框样式：rich = 卡片 / 进度条 / 近 7 天柱状图；plain = 旧的纯表格样式"
 }

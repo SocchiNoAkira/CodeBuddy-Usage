@@ -2,6 +2,17 @@
 
 English | [简体中文](./CHANGELOG.md)
 
+## [0.1.7]
+
+### Added
+
+- New `usageRefreshSeconds` (default 60): re-scans the local logs to refresh token usage without any network request
+
+### Fixed
+
+- Token usage stayed low for a long time when a conversation finished between two full refreshes (default 30 minutes): the index cursor was stuck at the old offset. Local statistics now lag at most one minute
+- Note: the calculation matches the CodeBuddy panel (summing `totalTokens` per step); the earlier gap was a refresh-lag issue, not a parsing bug
+
 ## [0.1.6]
 
 ### Fixed

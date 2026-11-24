@@ -41,7 +41,7 @@
 **从 vsix 安装**（推荐）
 
 ```bash
-code --install-extension codebuddy-usage-0.1.6.vsix
+code --install-extension codebuddy-usage-0.1.7.vsix
 ```
 
 或在扩展视图右上角 `⋯` → **Install from VSIX...**，装完 Reload Window。
@@ -112,6 +112,7 @@ code --install-extension codebuddy-usage-0.1.6.vsix
 | `apiBase` | `https://www.workbuddy.cn` | 国内站；国际站填 `https://www.workbuddy.ai` |
 | `tokenUsage` | 开 | 是否展示 token 消耗区块 |
 | `usageLogPath` | 空 | 自定义 CodeBuddy 日志目录；留空自动探测 |
+| `usageRefreshSeconds` | 60 | 本地日志重扫间隔（秒），0 关闭；只读文件不发请求 |
 | `usageTopModels` | 5 | 模型列表条数（1–10） |
 | `hoverStyle` | `rich` | `rich` = 当前看板；`plain` = 早期纯表格样式（兜底用） |
 

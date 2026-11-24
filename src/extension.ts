@@ -102,6 +102,8 @@ let lastBuddyClaimErrorDate = "";
 let lastBuddyWasTraveling = false;
 /** 防止并发 update 互相覆盖导致状态栏反复闪动/丢失 */
 let updating = false;
+/** 只刷新本地日志统计的轻量定时器（不走网络） */
+let usageTimer: NodeJS.Timeout | undefined;
 
 // ============================================================
 // token 用量（本地日志）状态
@@ -751,6 +753,34 @@ async function loadUsage(): Promise<UsageSnapshot | undefined> {
   }
 }
 
+/**
+ * 只重扫本地日志并刷新悬浮框，不触发任何网络请求。
+ *
+ * 为什么需要：整体刷新（默认 30 分钟）才顺带扫日志，而一轮对话往往在两次刷新之间跑完，
+ * 期间新增的 token 会一直显示不出来（索引游标落后于日志文件末尾）。
+ * 这里用秒级定时器把「本地统计」的滞后压到 1 分钟以内，成本只是 stat 几个文件 + 读新增字节。
+ */
+async function refreshUsageOnly() {
+  if (updating) return;
+  if (!getConfig().get<boolean>("tokenUsage", true)) return;
+  const usage = await loadUsage();
+  if (!usage) return;
+  lastUsage = usage;
+  refreshTooltip();
+}
+
+/** 按配置重新安排本地统计的刷新节奏 */
+function scheduleUsageTimer() {
+  if (usageTimer) {
+    clearInterval(usageTimer);
+    usageTimer = undefined;
+  }
+  const sec = getConfig().get<number>("usageRefreshSeconds", 60);
+  if (sec > 0) {
+    usageTimer = setInterval(() => void refreshUsageOnly(), Math.max(5, sec) * 1000);
+  }
+}
+
 /** 有剩余额度的套餐，按到期时间升序 */
 function visibleAccounts(res: UsageResult): Account[] {
   return res.accounts
@@ -1383,14 +1413,17 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand("codebuddyUsage.buddyDepart", () => buddyDepartCmd())
   );
-  // 悬浮框里的页签（命令面板中隐藏）：切换模型列表的时间窗
   update();
   scheduleTimer();
+  scheduleUsageTimer();
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration("codebuddyUsage.refreshIntervalMinutes")) {
         scheduleTimer();
+      }
+      if (e.affectsConfiguration("codebuddyUsage.usageRefreshSeconds")) {
+        scheduleUsageTimer();
       }
       if (e.affectsConfiguration("codebuddyUsage.accessToken")) {
         update();
@@ -1421,6 +1454,10 @@ export function deactivate() {
   if (timer) {
     clearInterval(timer);
     timer = undefined;
+  }
+  if (usageTimer) {
+    clearInterval(usageTimer);
+    usageTimer = undefined;
   }
   usageStore?.dispose();
 }

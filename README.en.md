@@ -43,7 +43,7 @@ Show **CodeBuddy / WorkBuddy credits** in the VS Code status bar. Hover it to se
 **From a vsix** (recommended)
 
 ```bash
-code --install-extension codebuddy-usage-0.1.6.vsix
+code --install-extension codebuddy-usage-0.1.7.vsix
 ```
 
 Or in the Extensions view: `⋯` → **Install from VSIX...**, then reload the window.
@@ -114,6 +114,7 @@ Search for `codebuddyUsage`:
 | `apiBase` | `https://www.workbuddy.cn` | Domestic site; use `https://www.workbuddy.ai` for the international one |
 | `tokenUsage` | on | Show the token usage block |
 | `usageLogPath` | empty | Custom CodeBuddy log directory; auto-detected when empty |
+| `usageRefreshSeconds` | 60 | Log re-scan interval in seconds, `0` disables it; local files only |
 | `usageTopModels` | 5 | Number of models listed (1–10) |
 | `hoverStyle` | `rich` | `rich` = current dashboard; `plain` = legacy table layout (fallback) |
 

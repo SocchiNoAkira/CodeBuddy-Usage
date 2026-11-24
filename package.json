@@ -3,7 +3,7 @@
   "displayName": "CodeBuddy Usage",
   "description": "%extension.description%",
   "publisher": "local",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "icon": "resources/icon.png",
   "license": "MIT",
   "repository": {
@@ -103,6 +103,11 @@
           "type": "string",
           "default": "",
           "description": "%config.usageLogPath%"
+        },
+        "codebuddyUsage.usageRefreshSeconds": {
+          "type": "number",
+          "default": 60,
+          "description": "%config.usageRefreshSeconds%"
         },
         "codebuddyUsage.usageTopModels": {
           "type": "number",

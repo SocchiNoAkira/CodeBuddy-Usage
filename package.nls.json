@@ -14,6 +14,7 @@
   "config.buddyTravel": "Enable buddy travel (send your buddy on tasks to earn credits automatically). When enabled, each refresh claims and dispatches the buddy automatically; the tooltip shows the travel countdown / claim / depart actions, once per day",
   "config.tokenUsage": "Show token usage in the hover panel (parsed from the local CodeBuddy extension logs: this hour / today / this month, plus per-model breakdown)",
   "config.usageLogPath": "Custom log directory of the CodeBuddy extension. Leave empty to auto-detect (%LOCALAPPDATA%/CodeBuddyExtension/Logs/VSCode on Windows)",
+  "config.usageRefreshSeconds": "How often to re-scan the local CodeBuddy logs for token usage, in seconds (default 60, minimum 5, 0 disables). This only reads local files and never sends a network request",
   "config.usageTopModels": "How many models to list in the hover panel (1-10)",
   "config.hoverStyle": "Hover panel style: rich = cards, progress bars and a 7-day chart; plain = the legacy markdown tables"
 }
