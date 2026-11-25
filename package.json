@@ -3,7 +3,7 @@
   "displayName": "CodeBuddy Usage",
   "description": "%extension.description%",
   "publisher": "local",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "icon": "resources/icon.png",
   "license": "MIT",
   "repository": {

@@ -10,7 +10,7 @@ import * as vscode from "vscode";
  *  - `##` 大字号主数值
  *  - `***` 细分隔线分组
  *  - 表格负责左标签 / 右对齐数值
- *  - `━ ─` 细横条用于「有明确进度」的场景（喵喵旅行）
+ *  - `█▏─` 精细进度条用于「有明确进度」的场景（模型占比，1/8 格精度）
  */
 
 export interface HoverChip {
@@ -59,9 +59,14 @@ export interface HoverVM {
   usage?: HoverUsageVM;
 }
 
-/** 细横条：填充 / 轨道 */
-const BAR_ON = "━";
+/**
+ * 进度条字符：满格 + 左分数块（1/8 精度）+ 细横线轨道。
+ * 分数块与满格在等宽字体里同宽同高，按顺序逐级填充，不会像 ░ 那样错位。
+ */
+const BAR_ON = "█";
 const BAR_OFF = "─";
+/** 索引 1..7 = 左侧 1/8 .. 7/8 填充；0 表示没有尾巴 */
+const BAR_FRACTIONS = ["", "▏", "▎", "▍", "▌", "▋", "▊", "▉"];
 const SEPARATOR = "***";
 
 const t = (
@@ -111,11 +116,29 @@ function compact(n: number): string {
   return String(Math.round(v));
 }
 
-/** 细进度条：━━━━━━──── */
-function bar(pct: number, cells = 10): string {
+/**
+ * 精细进度条：整数格用 █，余下的不足一格用左分数块（1/8 精度），其余用 ─ 补齐。
+ * 总宽度恒为 cells 个字符，保证表格列对齐。
+ */
+function bar(pct: number, cells = 8): string {
   const p = Math.max(0, Math.min(100, Number.isFinite(pct) ? pct : 0));
-  const filled = Math.round((p / 100) * cells);
-  return BAR_ON.repeat(filled) + BAR_OFF.repeat(Math.max(0, cells - filled));
+  const units = (p / 100) * cells * 8; // 每格细分为 8 档
+  let full = Math.floor(units / 8);
+  let eighth = Math.round(units % 8);
+  if (eighth >= 8) {
+    full += 1;
+    eighth = 0;
+  }
+  // 占比 >0 但连 1/8 格都不到时，至少露出一个最小分数块
+  if (p > 0 && full === 0 && eighth === 0) {
+    eighth = 1;
+  }
+  const used = full + (eighth > 0 ? 1 : 0);
+  return (
+    BAR_ON.repeat(full) +
+    BAR_FRACTIONS[eighth] +
+    BAR_OFF.repeat(Math.max(0, cells - used))
+  );
 }
 
 /** 缓存命中率：cacheTokens 是 inputTokens 中命中缓存的部分 */
